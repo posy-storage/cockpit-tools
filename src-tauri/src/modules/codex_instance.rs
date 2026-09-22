@@ -73,6 +73,7 @@ pub struct CreateInstanceParams {
     pub init_mode: Option<String>,
     pub launch_mode: Option<InstanceLaunchMode>,
     pub app_speed: Option<CodexAppSpeed>,
+    pub hide_native_quota_banner: Option<bool>,
 }
 
 #[derive(Debug, Clone)]
@@ -85,6 +86,7 @@ pub struct UpdateInstanceParams {
     pub model_routing: Option<Option<CodexInstanceModelRouting>>,
     pub launch_mode: Option<InstanceLaunchMode>,
     pub app_speed: Option<CodexAppSpeed>,
+    pub hide_native_quota_banner: Option<Option<bool>>,
 }
 
 fn instances_path() -> Result<PathBuf, String> {
@@ -127,6 +129,7 @@ pub fn update_default_settings(
     follow_local_account: Option<bool>,
     launch_mode: Option<InstanceLaunchMode>,
     auto_sync_threads: Option<bool>,
+    hide_native_quota_banner: Option<Option<bool>>,
 ) -> Result<DefaultInstanceSettings, String> {
     let _lock = CODEX_INSTANCE_STORE_LOCK
         .lock()
@@ -162,6 +165,10 @@ pub fn update_default_settings(
 
     if let Some(enabled) = auto_sync_threads {
         settings.auto_sync_threads = enabled;
+    }
+
+    if let Some(enabled) = hide_native_quota_banner {
+        settings.hide_native_quota_banner = enabled;
     }
 
     let updated = settings.clone();
@@ -976,6 +983,7 @@ pub fn create_instance(params: CreateInstanceParams) -> Result<InstanceProfile, 
         },
         launch_mode: params.launch_mode.unwrap_or_default(),
         app_speed: params.app_speed.unwrap_or_default(),
+        hide_native_quota_banner: params.hide_native_quota_banner,
         created_at: Utc::now().timestamp_millis(),
         last_launched_at: None,
         last_pid: None,
@@ -1034,6 +1042,9 @@ pub fn update_instance(params: UpdateInstanceParams) -> Result<InstanceProfile, 
     }
     if let Some(speed) = params.app_speed {
         instance.app_speed = speed;
+    }
+    if let Some(enabled) = params.hide_native_quota_banner {
+        instance.hide_native_quota_banner = enabled;
     }
 
     let updated = instance.clone();
@@ -1185,6 +1196,7 @@ pub fn disable_model_routing(instance_id: &str) -> Result<bool, String> {
             None,
             None,
             None,
+            None,
         )?;
         return Ok(true);
     }
@@ -1210,6 +1222,7 @@ pub fn disable_model_routing(instance_id: &str) -> Result<bool, String> {
         })),
         launch_mode: None,
         app_speed: None,
+        hide_native_quota_banner: None,
     })?;
     Ok(true)
 }

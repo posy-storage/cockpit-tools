@@ -486,6 +486,7 @@ pub async fn codex_local_access_activate(
             Some(false),
             None,
             None,
+            None,
         ) {
             logger::log_warn(&format!("更新 Codex 默认实例为 API 服务模式失败: {}", e));
         } else {

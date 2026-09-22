@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Obnovení dokončeno, úspěšných účtů: {{count}}",
     "refreshAllPartialFailed": "Obnovení dokončeno, {{success}} / {{total}} účtů úspěšných, některé selhaly",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Skrýt nativní upozornění Codex na vyčerpanou kvótu",
+      "hideNativeQuotaBannerDescription": "Skryje upozornění na vyčerpanou kvótu v desktopovém klientu, aniž by změnilo kvótu nebo stav služby. Ve výchozím nastavení zapnuto při spuštění desktopu přes službu API, jinak vypnuto. Volba se ukládá pro každou instanci. Režim CLI nemění rozhraní.",
       "configLoading": "Načítání nastavení instance…",
       "configRefreshing": "Kontrola nastavení instance. Stávající údaje zůstávají dostupné.",
       "configLoadTimeout": "Načítání nastavení instance překročilo časový limit. Zkuste to znovu.",

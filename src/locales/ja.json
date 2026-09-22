@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "更新完了、{{count}} アカウント成功",
     "refreshAllPartialFailed": "更新完了、{{success}} / {{total}} アカウント成功、一部失敗",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Codex 標準の利用上限通知を非表示",
+      "hideNativeQuotaBannerDescription": "アカウントの利用枠やサービスの状態を変更せず、デスクトップの利用枠超過通知だけを非表示にします。API サービス経由のデスクトップ起動では既定でオン、それ以外はオフです。選択はインスタンスごとに保存されます。CLI 起動では表示を変更しません。",
       "configLoading": "インスタンス設定を読み込み中…",
       "configRefreshing": "インスタンス設定を確認中です。既存の内容は引き続き表示できます。",
       "configLoadTimeout": "インスタンス設定の読み込みがタイムアウトしました。再試行してください。",

@@ -45,6 +45,8 @@ import {
 import { useCodexAccountStore } from "../../stores/useCodexAccountStore";
 import { useCodexInstanceStore } from "../../stores/useCodexInstanceStore";
 import type { CodexInstanceApiRoute } from "../../types/instance";
+import { CODEX_API_SERVICE_BIND_ID } from "../../types/instance";
+import { resolveNativeQuotaBannerPreference } from "../../utils/codexNativeQuotaBanner";
 import {
   CodexModelRoutingFields,
   buildCodexModelRoutingValue,
@@ -319,6 +321,26 @@ export function CodexLaunchPreviewModal({
     [instanceId, instances],
   );
   const previewTargetKey = JSON.stringify([instanceId, accountId]);
+  // Key the draft by the launch subject, not by the polled instance object.
+  // An untouched default stays unset so switching launch sources can use their defaults.
+  const nativeQuotaDraftKey = JSON.stringify([instanceId, accountId, mode]);
+  const [nativeQuotaDraft, setNativeQuotaDraft] = useState<{
+    key: string;
+    value: boolean;
+  } | null>(null);
+  useEffect(() => { setNativeQuotaDraft(null); }, [nativeQuotaDraftKey]);
+  const nativeQuotaBindId = mode === "apiService"
+    ? CODEX_API_SERVICE_BIND_ID
+    : mode === "account"
+      ? accountId
+      : selectedInstance?.bindAccountId;
+  const hideNativeQuotaBanner = nativeQuotaDraft?.key === nativeQuotaDraftKey
+    ? nativeQuotaDraft.value
+    : resolveNativeQuotaBannerPreference(
+        selectedInstance?.hideNativeQuotaBanner,
+        nativeQuotaBindId,
+        selectedInstance?.launchMode ?? "app",
+      );
   const instanceConfigKey = codexLaunchPreviewInstanceConfigKey(selectedInstance);
   const instanceConfigChanged = loadedInstanceKey !== null && loadedInstanceKey !== instanceConfigKey;
   const configReady = loadedTarget === previewTargetKey && !loading &&
@@ -864,6 +886,14 @@ export function CodexLaunchPreviewModal({
       setNotice(null);
       setError(null);
       try {
+        // All launch entry points share this modal (account, provider, API service,
+        // and instance). Persist here before their binding/start transactions.
+        if (nativeQuotaDraft?.key === nativeQuotaDraftKey) {
+          await useCodexInstanceStore.getState().updateInstance({
+            instanceId,
+            hideNativeQuotaBanner: nativeQuotaDraft.value,
+          });
+        }
         const launchOptions: CodexLaunchPreviewLaunchOptions | undefined =
           account && isDeepSeekAccount(account)
             ? {
@@ -884,6 +914,10 @@ export function CodexLaunchPreviewModal({
     },
     [
       accounts,
+      account,
+      instanceId,
+      nativeQuotaDraft,
+      nativeQuotaDraftKey,
       configBusy,
       deepSeekAccessMode,
       imageGenAccountIds,
@@ -1708,6 +1742,29 @@ export function CodexLaunchPreviewModal({
             </section>
 
             <div className="codex-launch-preview-tool-list">
+              <section className="codex-launch-preview-tool-row">
+                <div className="codex-launch-preview-tool-icon">
+                  <SlidersHorizontal size={16} />
+                </div>
+                <div className="codex-launch-preview-tool-copy">
+                  <h3>{t("codex.launchPreview.hideNativeQuotaBannerTitle", "隐藏 Codex 官方额度提示")}</h3>
+                  <p>
+                    {t("codex.launchPreview.hideNativeQuotaBannerDescription", "仅隐藏桌面客户端的额度耗尽提示，不修改账户额度或服务状态。API 服务的桌面启动默认开启，其他启动默认关闭，可手动调整。CLI 不执行显示注入。")}
+                  </p>
+                </div>
+                <label className="codex-launch-preview-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={hideNativeQuotaBanner}
+                    disabled={configBusy}
+                    onChange={(event) => setNativeQuotaDraft({
+                      key: nativeQuotaDraftKey,
+                      value: event.target.checked,
+                    })}
+                  />
+                  <span>{t("common.enable", "启用")}</span>
+                </label>
+              </section>
               {providerRowsVisible && mode !== "apiService" && (
                 <section className="codex-launch-preview-tool-row">
                   <div className="codex-launch-preview-tool-icon">

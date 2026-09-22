@@ -3529,6 +3529,7 @@ mod tests {
 
         let store = InstanceStore {
             instances: vec![InstanceProfile {
+                hide_native_quota_banner: None,
                 id: "inst-333".to_string(),
                 name: "333".to_string(),
                 user_data_dir: temp.0.join("inst-333").to_string_lossy().to_string(),

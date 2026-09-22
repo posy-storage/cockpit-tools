@@ -235,6 +235,7 @@
         bind_account_id: Option<&str>,
     ) -> InstanceProfile {
         InstanceProfile {
+            hide_native_quota_banner: None,
             id: id.to_string(),
             name: id.to_string(),
             user_data_dir: profile_dir.to_string(),

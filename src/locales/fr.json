@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Actualisation terminée, {{count}} compte(s) réussi(s)",
     "refreshAllPartialFailed": "Actualisation terminée, {{success}} / {{total}} compte(s) réussi(s), certains ont échoué",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Masquer la bannière de quota native de Codex",
+      "hideNativeQuotaBannerDescription": "Masque l'avertissement de quota épuisé du client de bureau sans modifier le quota ni l'état du service. Activé par défaut pour les lancements de bureau via le service API, désactivé sinon. Le choix est enregistré par instance. Aucun changement d'affichage en mode CLI.",
       "configLoading": "Chargement de la configuration de l’instance…",
       "configRefreshing": "Vérification de la configuration de l’instance. Les données actuelles restent disponibles.",
       "configLoadTimeout": "Le chargement de la configuration de l’instance a expiré. Réessayez.",

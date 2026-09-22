@@ -47,6 +47,51 @@
     }
 
     #[test]
+    fn native_quota_banner_manual_opt_in_supports_every_desktop_binding() {
+        use crate::models::InstanceLaunchMode::{App, Cli};
+        for bind in [None, Some("__api_service__"), Some("oauth"), Some("deepseek"),
+            Some("__provider_gateway__:key"), Some("api-key")] {
+            assert_eq!(super::native_quota_banner_enabled(None, bind, &App),
+                bind == Some("__api_service__"));
+            assert!(super::native_quota_banner_enabled(Some(true), bind, &App));
+            assert!(!super::native_quota_banner_enabled(Some(false), bind, &App));
+            assert!(!super::native_quota_banner_enabled(Some(true), bind, &Cli));
+            assert!(super::should_enable_cdp(bind, true));
+        }
+    }
+
+    #[tokio::test]
+    async fn native_quota_cdp_never_registers_stale_new_document_scripts() {
+        use futures_util::{SinkExt, StreamExt};
+        for enabled in [false, true] {
+            let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let address = listener.local_addr().unwrap();
+            let server = tokio::spawn(async move {
+                let (stream, _) = listener.accept().await.unwrap();
+                let mut socket = tokio_tungstenite::accept_async(stream).await.unwrap();
+                let message = socket.next().await.unwrap().unwrap().into_text().unwrap();
+                let request: serde_json::Value = serde_json::from_str(&message).unwrap();
+                assert_eq!(request["method"], "Runtime.evaluate");
+                socket.send(tokio_tungstenite::tungstenite::Message::Text(
+                    json!({"id": request["id"], "result": {"result": {"type":"undefined"}}})
+                        .to_string().into(),
+                )).await.unwrap();
+            });
+            let target = CdpTarget {
+                target_id: "native-quota-test".into(), target_type: "page".into(),
+                url: "app://-/index.html".into(),
+                websocket_url: Some(format!("ws://{}", address)),
+            };
+            let result = super::evaluate_target(
+                &target, &super::native_quota_script(enabled, "test-session"),
+                super::NATIVE_QUOTA_SCRIPT_KIND,
+            ).await;
+            assert!(result.is_some());
+            server.await.unwrap();
+        }
+    }
+
+    #[test]
     fn enabled_replaces_debug_flags_with_loopback_port() {
         let args = vec![
             "--remote-debugging-port=9333".to_string(),

@@ -229,6 +229,8 @@ pub struct CodexInstanceProfileView {
     pub model_routing: Option<CodexInstanceModelRouting>,
     pub launch_mode: InstanceLaunchMode,
     pub app_speed: CodexAppSpeed,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hide_native_quota_banner: Option<bool>,
     pub created_at: i64,
     pub last_launched_at: Option<i64>,
     pub last_pid: Option<u32>,
@@ -253,6 +255,7 @@ impl CodexInstanceProfileView {
             model_routing: profile.model_routing,
             launch_mode: profile.launch_mode,
             app_speed: profile.app_speed,
+            hide_native_quota_banner: profile.hide_native_quota_banner,
             created_at: profile.created_at,
             last_launched_at: profile.last_launched_at,
             last_pid: profile.last_pid,
@@ -497,6 +500,7 @@ fn default_instance_view(
         model_routing: default_settings.model_routing.clone(),
         launch_mode: default_settings.launch_mode.clone(),
         app_speed: default_settings.app_speed.clone(),
+        hide_native_quota_banner: default_settings.hide_native_quota_banner,
         created_at: 0,
         last_launched_at: None,
         last_pid,
@@ -814,6 +818,40 @@ mod tests {
         drop(other);
     }
 
+    #[tokio::test]
+    async fn native_quota_preference_persists_for_default_and_named_instances() {
+        let _lock = crate::modules::test_support::env_lock()
+            .lock().unwrap_or_else(|error| error.into_inner());
+        let env = TestDataDirGuard::new("cockpit-native-quota-preference");
+        let mut store = crate::models::InstanceStore::new();
+        store.default_settings.bind_account_id = Some("__api_service__".to_string());
+        store.default_settings.follow_local_account = false;
+        store.instances.push(serde_json::from_value(serde_json::json!({
+            "id": "quota-test", "name": "Quota test",
+            "userDataDir": env.root.join("profile").to_string_lossy(),
+            "extraArgs": "", "bindAccountId": "__api_service__",
+            "createdAt": 1, "lastLaunchedAt": null
+        })).unwrap());
+        modules::codex_instance::save_instance_store(&store).unwrap();
+        for instance_id in [DEFAULT_INSTANCE_ID, "quota-test"] {
+            for preference in [false, true] {
+                let view = codex_update_instance(
+                    instance_id.to_string(),
+                    None, None, None, None, None, None, None, None, None, None,
+                    Some(preference),
+                ).await.unwrap();
+                assert_eq!(view.hide_native_quota_banner, Some(preference));
+                let saved = modules::codex_instance::load_instance_store().unwrap();
+                let persisted = if instance_id == DEFAULT_INSTANCE_ID {
+                    saved.default_settings.hide_native_quota_banner
+                } else {
+                    saved.instances[0].hide_native_quota_banner
+                };
+                assert_eq!(persisted, Some(preference));
+            }
+        }
+    }
+
     #[test]
     fn instance_start_cancel_request_is_scoped_and_clearable() {
         let instance_id = "cancel-test-instance";
@@ -997,6 +1035,7 @@ mod tests {
             .expect("copy source profile");
 
         let instance = InstanceProfile {
+            hide_native_quota_banner: None,
             id: "created-instance".to_string(),
             name: "Created instance".to_string(),
             user_data_dir: target_dir.to_string_lossy().to_string(),
@@ -1045,6 +1084,7 @@ mod tests {
         std::fs::write(&profile_path, "not a directory").expect("write blocked profile path");
         let mut store = crate::models::InstanceStore::new();
         store.instances.push(InstanceProfile {
+            hide_native_quota_banner: None,
             id: "routing-rollback-instance".to_string(),
             name: "Original name".to_string(),
             user_data_dir: profile_path.to_string_lossy().to_string(),
@@ -1070,6 +1110,7 @@ mod tests {
             None,
             None,
             Some(CodexAppSpeed::Fast),
+            None,
             None,
             None,
         )
@@ -1111,6 +1152,7 @@ mod tests {
 
         let mut store = crate::models::InstanceStore::new();
         store.instances.push(InstanceProfile {
+            hide_native_quota_banner: None,
             id: instance_id.to_string(),
             name: "Context preservation test".to_string(),
             user_data_dir: profile_dir.to_string_lossy().to_string(),
@@ -1141,6 +1183,7 @@ mod tests {
     #[test]
     fn app_exit_preserves_running_profiles_even_when_routing_was_disabled_for_later() {
         let profile = |id: &str, enabled: bool, pid: u32| InstanceProfile {
+            hide_native_quota_banner: None,
             id: id.to_string(),
             name: id.to_string(),
             user_data_dir: format!("/test/{id}"),
@@ -1215,6 +1258,7 @@ mod tests {
             false,
             test_experimental_models(),
             None,
+            None,
         )
         .await
         .expect("disable routing");
@@ -1229,6 +1273,7 @@ mod tests {
             Some(Some("another-oauth-account".to_string())),
             None, None, None, None, None,
             Some(true),
+            None,
         )
         .await
         .expect("save new binding without launching Codex");
@@ -1287,6 +1332,7 @@ mod tests {
             Some(Some(CodexInstanceModelRouting { enabled: true, ..Default::default() })),
             None, None, None, None, Some(true), None, None, None,
             true, test_experimental_models(), None,
+            None,
         ).await;
         let saved = result
             .expect("绑定账号不是 OAuth 订阅账号时，混合模型路由必须自动关闭而不是拦住保存");
@@ -1328,6 +1374,7 @@ mod tests {
             std::fs::write(profile_dir.join("config.toml"), "model = \"gpt-5\"\n")
                 .expect("write base config");
             store.instances.push(InstanceProfile {
+                hide_native_quota_banner: None,
                 id: instance_id.to_string(),
                 name: instance_id.to_string(),
                 user_data_dir: profile_dir.to_string_lossy().to_string(),
@@ -1400,6 +1447,7 @@ mod tests {
             false,
             test_experimental_models(),
             None,
+            None,
         )
         .await
         .expect("save instance configuration");
@@ -1469,6 +1517,7 @@ mod tests {
             false,
             test_experimental_models(),
             None,
+            None,
         )
         .await
         .expect("save instance configuration");
@@ -1509,6 +1558,7 @@ mod tests {
             None,
             true,
             test_experimental_models(),
+            None,
             None,
         )
         .await
@@ -2125,6 +2175,7 @@ pub async fn codex_save_instance_configuration(
     experimental_model_catalog_enabled: bool,
     experimental_model_catalog_models: Vec<CodexExperimentalModelDefinition>,
     experimental_model_catalog_default_model_id: Option<String>,
+    hide_native_quota_banner: Option<bool>,
 ) -> Result<CodexInstanceConfigurationSaveResult, String> {
     let profile = resolve_instance_base_dir(&instance_id)?;
     if defer_bind_account_application == Some(true) && model_routing.is_some() {
@@ -2172,6 +2223,7 @@ pub async fn codex_save_instance_configuration(
         let result = codex_update_instance(
             instance_id.clone(), name, working_dir, extra_args, bind_account_id, model_routing,
             follow_local_account, launch_mode, app_speed, auto_sync_threads, Some(true),
+            hide_native_quota_banner,
         ).await;
         return match result {
             Ok(instance) => Ok(CodexInstanceConfigurationSaveResult { instance, quick_config }),
@@ -2237,6 +2289,7 @@ pub async fn codex_save_instance_configuration(
         app_speed,
         auto_sync_threads,
         defer_bind_account_application,
+        hide_native_quota_banner,
     )
     .await;
 
@@ -2574,6 +2627,7 @@ pub async fn codex_create_instance(
     init_mode: Option<String>,
     launch_mode: Option<InstanceLaunchMode>,
     app_speed: Option<CodexAppSpeed>,
+    hide_native_quota_banner: Option<bool>,
 ) -> Result<CodexInstanceProfileView, String> {
     let effective_launch_mode = launch_mode.clone().unwrap_or_default();
     // 归一化结果必须落库：绑定账号不支持混合路由时按“已关闭”保存，
@@ -2595,6 +2649,7 @@ pub async fn codex_create_instance(
             init_mode,
             launch_mode,
             app_speed,
+            hide_native_quota_banner,
         })?;
 
     created_instance_view_after_binding(
@@ -2625,6 +2680,7 @@ pub async fn codex_update_instance(
     app_speed: Option<CodexAppSpeed>,
     auto_sync_threads: Option<bool>,
     defer_bind_account_application: Option<bool>,
+    hide_native_quota_banner: Option<bool>,
 ) -> Result<CodexInstanceProfileView, String> {
     let model_routing_update_requested = model_routing.is_some();
     let app_speed_update_requested = app_speed.is_some();
@@ -2663,6 +2719,7 @@ pub async fn codex_update_instance(
             follow_local_account,
             launch_mode,
             auto_sync_threads,
+            hide_native_quota_banner.map(Some),
         )?;
         let mut update_error = None;
         if let Some(speed) = app_speed {
@@ -2705,6 +2762,7 @@ pub async fn codex_update_instance(
                 Some(current.follow_local_account),
                 Some(current.launch_mode.clone()),
                 Some(current.auto_sync_threads),
+                Some(current.hide_native_quota_banner),
             ) {
                 rollback_errors.push(rollback_error);
             }
@@ -2802,6 +2860,7 @@ pub async fn codex_update_instance(
             model_routing,
             launch_mode,
             app_speed,
+            hide_native_quota_banner: hide_native_quota_banner.map(Some),
         })?;
     let mut update_error = selected_app_speed.and_then(|speed| {
         modules::codex_speed::write_app_speed_for_dir(Path::new(&instance.user_data_dir), speed)
@@ -2840,6 +2899,7 @@ pub async fn codex_update_instance(
                 model_routing: Some(current.model_routing.clone()),
                 launch_mode: Some(current.launch_mode.clone()),
                 app_speed: Some(current.app_speed.clone()),
+                hide_native_quota_banner: Some(current.hide_native_quota_banner),
             },
         ) {
             rollback_errors.push(rollback_error);
@@ -3369,8 +3429,15 @@ async fn codex_start_instance_internal(
         }
 
         let extra_args = modules::process::parse_extra_args(&default_settings.extra_args);
-        let cdp_enabled =
-            modules::codex_app_injection::should_enable_cdp(default_bind_account_id.as_deref());
+        let hide_native_quota = modules::codex_app_injection::native_quota_banner_enabled(
+            default_settings.hide_native_quota_banner,
+            default_bind_account_id.as_deref(),
+            &default_settings.launch_mode,
+        );
+        let cdp_enabled = modules::codex_app_injection::should_enable_cdp(
+            default_bind_account_id.as_deref(),
+            hide_native_quota,
+        );
         let injection_plan =
             modules::codex_app_injection::build_launch_args(&extra_args, cdp_enabled)?;
         emit_codex_instance_launch_step(
@@ -3407,6 +3474,7 @@ async fn codex_start_instance_internal(
             default_dir.clone(),
             injection_plan.port,
             default_bind_account_id.clone(),
+            hide_native_quota,
         );
         let running = modules::process::is_pid_running(pid);
         modules::logger::log_info(&format!(
@@ -3671,8 +3739,15 @@ async fn codex_start_instance_internal(
 
     modules::process::ensure_codex_launch_path_configured()?;
     let extra_args = modules::process::parse_extra_args(&instance.extra_args);
-    let cdp_enabled =
-        modules::codex_app_injection::should_enable_cdp(instance.bind_account_id.as_deref());
+    let hide_native_quota = modules::codex_app_injection::native_quota_banner_enabled(
+        instance.hide_native_quota_banner,
+        instance.bind_account_id.as_deref(),
+        &instance.launch_mode,
+    );
+    let cdp_enabled = modules::codex_app_injection::should_enable_cdp(
+        instance.bind_account_id.as_deref(),
+        hide_native_quota,
+    );
     let injection_plan = modules::codex_app_injection::build_launch_args(&extra_args, cdp_enabled)?;
     emit_codex_instance_launch_step(
         &app,
@@ -3706,6 +3781,7 @@ async fn codex_start_instance_internal(
         instance_dir.to_path_buf(),
         injection_plan.port,
         instance.bind_account_id.clone(),
+        hide_native_quota,
     );
     let running = modules::process::is_pid_running(pid);
     let initialized = is_profile_initialized(&updated.user_data_dir);

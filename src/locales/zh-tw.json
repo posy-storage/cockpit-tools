@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "重新整理完成，成功 {{count}} 個帳號",
     "refreshAllPartialFailed": "重新整理完成，成功 {{success}} / {{total}} 個帳號，部分失敗",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "隱藏 Codex 官方額度提示",
+      "hideNativeQuotaBannerDescription": "僅隱藏桌面用戶端的額度耗盡提示，不修改帳戶額度或服務狀態。API 服務的桌面啟動預設開啟，其他啟動預設關閉；手動選擇按執行個體儲存。CLI 不執行顯示注入。",
       "configLoading": "正在讀取執行個體設定…",
       "configRefreshing": "正在核對執行個體設定，現有內容仍可檢視。",
       "configLoadTimeout": "讀取執行個體設定逾時，請重試。",

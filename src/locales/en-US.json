@@ -2331,6 +2331,8 @@
     "refreshAllSuccess": "Refresh completed, {{count}} account(s) succeeded",
     "refreshAllPartialFailed": "Refresh completed, {{success}} / {{total}} account(s) succeeded and some failed",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Hide Codex native quota banner",
+      "hideNativeQuotaBannerDescription": "Hide the desktop client's depleted-usage banner without changing account quota or service status. On by default for API Service desktop launches, off otherwise; your choice is saved per instance. CLI launches do not inject UI changes.",
       "configLoading": "Loading instance configuration…",
       "configRefreshing": "Checking instance configuration. Existing details remain available.",
       "configLoadTimeout": "Loading instance configuration timed out. Please retry.",

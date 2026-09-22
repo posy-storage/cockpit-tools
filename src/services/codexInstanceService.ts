@@ -82,6 +82,7 @@ export async function createInstance(payload: {
   modelRouting?: CodexInstanceModelRouting | null;
   launchMode?: InstanceLaunchMode;
   appSpeed?: CodexAppSpeed;
+  hideNativeQuotaBanner?: boolean;
   copySourceInstanceId: string;
   initMode?: "copy" | "empty" | "existingDir";
 }): Promise<InstanceProfile> {
@@ -94,6 +95,7 @@ export async function createInstance(payload: {
     modelRouting: payload.modelRouting ?? null,
     launchMode: payload.launchMode ?? "app",
     appSpeed: payload.appSpeed ?? "standard",
+    hideNativeQuotaBanner: payload.hideNativeQuotaBanner,
     copySourceInstanceId: payload.copySourceInstanceId,
     initMode: payload.initMode ?? "copy",
   });
@@ -109,6 +111,7 @@ export async function updateInstance(payload: {
   followLocalAccount?: boolean;
   launchMode?: InstanceLaunchMode;
   appSpeed?: CodexAppSpeed;
+  hideNativeQuotaBanner?: boolean;
   autoSyncThreads?: boolean;
   deferBindAccountApplication?: boolean;
 }): Promise<InstanceProfile> {
@@ -138,6 +141,9 @@ export async function updateInstance(payload: {
   }
   if (payload.appSpeed !== undefined) {
     body.appSpeed = payload.appSpeed;
+  }
+  if (payload.hideNativeQuotaBanner !== undefined) {
+    body.hideNativeQuotaBanner = payload.hideNativeQuotaBanner;
   }
   if (payload.autoSyncThreads !== undefined) {
     body.autoSyncThreads = payload.autoSyncThreads;
@@ -212,6 +218,7 @@ export async function saveCodexInstanceConfiguration(payload: {
   followLocalAccount?: boolean;
   launchMode?: InstanceLaunchMode;
   appSpeed?: CodexAppSpeed;
+  hideNativeQuotaBanner?: boolean;
   autoSyncThreads?: boolean;
   deferBindAccountApplication?: boolean;
   updateContextOverride?: boolean;
@@ -238,6 +245,7 @@ export async function saveCodexInstanceConfiguration(payload: {
     followLocalAccount: payload.followLocalAccount,
     launchMode: payload.launchMode,
     appSpeed: payload.appSpeed,
+    hideNativeQuotaBanner: payload.hideNativeQuotaBanner,
     autoSyncThreads: payload.autoSyncThreads,
     deferBindAccountApplication: payload.deferBindAccountApplication,
     updateContextOverride: payload.updateContextOverride,

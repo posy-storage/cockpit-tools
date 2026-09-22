@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Aktualisierung abgeschlossen, {{count}} Konto/Konten erfolgreich",
     "refreshAllPartialFailed": "Aktualisierung abgeschlossen, {{success}} / {{total}} Konten erfolgreich, einige fehlgeschlagen",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Natives Kontingentbanner von Codex ausblenden",
+      "hideNativeQuotaBannerDescription": "Blendet den Hinweis auf verbrauchtes Kontingent im Desktop-Client aus, ohne Kontingent oder Dienststatus zu ändern. Bei Desktop-Starts über den API-Dienst standardmäßig an, sonst aus. Ihre Auswahl wird pro Instanz gespeichert. CLI-Starts ändern die Oberfläche nicht.",
       "configLoading": "Instanzkonfiguration wird geladen…",
       "configRefreshing": "Instanzkonfiguration wird geprüft. Vorhandene Angaben bleiben verfügbar.",
       "configLoadTimeout": "Zeitüberschreitung beim Laden der Instanzkonfiguration. Bitte erneut versuchen.",

@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "새로고침 완료, {{count}}개 계정 성공",
     "refreshAllPartialFailed": "새로고침 완료, {{success}} / {{total}}개 계정 성공, 일부 실패",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Codex 기본 사용량 한도 알림 숨기기",
+      "hideNativeQuotaBannerDescription": "계정 한도나 서비스 상태를 변경하지 않고 데스크톱 클라이언트의 한도 소진 알림만 숨깁니다. API 서비스를 통한 데스크톱 실행에서는 기본으로 켜지고, 다른 경우에는 꺼집니다. 선택은 인스턴스별로 저장됩니다. CLI 실행은 화면을 변경하지 않습니다.",
       "configLoading": "인스턴스 설정을 불러오는 중…",
       "configRefreshing": "인스턴스 설정을 확인 중입니다. 기존 내용은 계속 볼 수 있습니다.",
       "configLoadTimeout": "인스턴스 설정 불러오기 시간이 초과되었습니다. 다시 시도하세요.",

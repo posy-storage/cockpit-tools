@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Aggiornamento completato, {{count}} account riusciti",
     "refreshAllPartialFailed": "Aggiornamento completato, {{success}} / {{total}} account riusciti, alcuni non riusciti",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Nascondi l'avviso di quota nativo di Codex",
+      "hideNativeQuotaBannerDescription": "Nasconde l'avviso di quota esaurita nel client desktop senza modificare la quota o lo stato del servizio. Attivo per impostazione predefinita per gli avvii desktop tramite il servizio API, altrimenti disattivo. La scelta viene salvata per istanza. Nessuna modifica all'interfaccia in modalità CLI.",
       "configLoading": "Caricamento della configurazione dell’istanza…",
       "configRefreshing": "Verifica della configurazione dell’istanza. I dati attuali restano disponibili.",
       "configLoadTimeout": "Tempo scaduto durante il caricamento della configurazione dell’istanza. Riprova.",

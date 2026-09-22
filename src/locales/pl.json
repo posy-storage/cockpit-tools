@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Odświeżanie zakończone, {{count}} kont(a) pomyślnie",
     "refreshAllPartialFailed": "Odświeżanie zakończone, {{success}} / {{total}} kont pomyślnie, część nieudana",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Ukryj natywny komunikat o limicie Codex",
+      "hideNativeQuotaBannerDescription": "Ukrywa komunikat o wyczerpaniu limitu w aplikacji komputerowej bez zmiany limitu ani stanu usługi. Domyślnie włączone przy uruchamianiu aplikacji przez usługę API, poza tym wyłączone. Wybór jest zapisywany dla każdej instancji. Tryb CLI nie zmienia interfejsu.",
       "configLoading": "Wczytywanie konfiguracji instancji…",
       "configRefreshing": "Sprawdzanie konfiguracji instancji. Dotychczasowe dane pozostają dostępne.",
       "configLoadTimeout": "Przekroczono czas wczytywania konfiguracji instancji. Spróbuj ponownie.",

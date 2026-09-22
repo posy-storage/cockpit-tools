@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Làm mới hoàn tất, {{count}} tài khoản thành công",
     "refreshAllPartialFailed": "Làm mới hoàn tất, {{success}} / {{total}} tài khoản thành công và một số thất bại",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Ẩn thông báo hạn mức gốc của Codex",
+      "hideNativeQuotaBannerDescription": "Ẩn thông báo hết hạn mức trong ứng dụng máy tính mà không thay đổi hạn mức tài khoản hay trạng thái dịch vụ. Mặc định bật khi khởi chạy ứng dụng máy tính qua dịch vụ API, tắt trong các trường hợp khác. Lựa chọn được lưu theo từng phiên bản ứng dụng. Chế độ CLI không thay đổi giao diện.",
       "configLoading": "Đang tải cấu hình phiên bản…",
       "configRefreshing": "Đang kiểm tra cấu hình phiên bản. Bạn vẫn có thể xem thông tin hiện có.",
       "configLoadTimeout": "Đã hết thời gian tải cấu hình phiên bản. Vui lòng thử lại.",

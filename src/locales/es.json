@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Actualización completada, {{count}} cuenta(s) correctas",
     "refreshAllPartialFailed": "Actualización completada, {{success}} / {{total}} cuentas correctas y algunas fallaron",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Ocultar el aviso de cuota nativo de Codex",
+      "hideNativeQuotaBannerDescription": "Oculta el aviso de cuota agotada del cliente de escritorio sin modificar la cuota ni el estado del servicio. Activado por defecto al iniciar desde el servicio API en modo escritorio; desactivado en otros casos. La elección se guarda por instancia. No modifica la interfaz en modo CLI.",
       "configLoading": "Cargando la configuración de la instancia…",
       "configRefreshing": "Comprobando la configuración de la instancia. Los datos actuales siguen disponibles.",
       "configLoadTimeout": "Se agotó el tiempo para cargar la configuración de la instancia. Inténtalo de nuevo.",

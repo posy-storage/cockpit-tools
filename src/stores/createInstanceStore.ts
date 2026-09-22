@@ -38,6 +38,7 @@ export type InstanceStoreState = {
     followLocalAccount?: boolean;
     launchMode?: InstanceLaunchMode;
     appSpeed?: CodexAppSpeed;
+    hideNativeQuotaBanner?: boolean;
     autoSyncThreads?: boolean;
     deferBindAccountApplication?: boolean;
   }) => Promise<InstanceProfile>;
@@ -73,6 +74,7 @@ type InstanceService = {
     followLocalAccount?: boolean;
     launchMode?: InstanceLaunchMode;
     appSpeed?: CodexAppSpeed;
+    hideNativeQuotaBanner?: boolean;
     autoSyncThreads?: boolean;
     deferBindAccountApplication?: boolean;
   }) => Promise<InstanceProfile>;

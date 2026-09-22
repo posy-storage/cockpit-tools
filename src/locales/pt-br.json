@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Atualização concluída, {{count}} conta(s) com sucesso",
     "refreshAllPartialFailed": "Atualização concluída, {{success}} / {{total}} conta(s) com sucesso e algumas falharam",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Ocultar o aviso de cota nativo do Codex",
+      "hideNativeQuotaBannerDescription": "Oculta o aviso de cota esgotada no cliente de desktop sem alterar a cota ou o estado do serviço. Ativado por padrão ao iniciar pelo serviço API no desktop; desativado nos demais casos. A escolha é salva por instância. O modo CLI não altera a interface.",
       "configLoading": "Carregando a configuração da instância…",
       "configRefreshing": "Verificando a configuração da instância. Os dados atuais continuam disponíveis.",
       "configLoadTimeout": "O carregamento da configuração da instância excedeu o tempo limite. Tente novamente.",

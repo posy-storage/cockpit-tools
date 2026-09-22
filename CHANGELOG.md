@@ -9,6 +9,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 ## [Unreleased]
 
+## [1.3.59] - 2026-09-22
+
+### Added
+
+- **Per-instance native Codex quota banner control**: account, provider, API Service and instance launch previews now offer a shared display switch, including the default instance. API Service desktop launches enable it by default; other launches default to off, and an explicit user choice is preserved per instance. CLI launches do not inject UI changes, and instance import/export excludes this setting.
+- **Recoverable semantic banner suppression**: the existing loopback CDP lifecycle hides only the confirmed `workspace_member_credits_depleted` banner inside the composer. Unknown banners and safety warnings remain visible. Disabling the option, stopping injection or losing the host heartbeat restores the original display; React redraws and composer replacement are supported.
+
+### Fixed
+
+- Added localized switch labels and descriptions for all 18 supported locale files, with regression coverage for preference persistence, defaults, React Fiber recognition, restoration and CDP lifecycle behavior.
+
 ## [1.3.58] - 2026-09-22
 
 ### Added

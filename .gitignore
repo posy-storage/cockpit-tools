@@ -50,3 +50,6 @@ target/
 docs/plugin-architecture-proposal.md
 .aitasks
 .qoder/
+
+# Local development and verification files
+/local/

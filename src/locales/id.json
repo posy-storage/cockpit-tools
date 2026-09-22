@@ -2158,6 +2158,8 @@
     "refreshAllSuccess": "Penyegaran selesai, {{count}} akun berhasil",
     "refreshAllPartialFailed": "Penyegaran selesai, {{success}} / {{total}} akun berhasil dan beberapa gagal",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Sembunyikan pemberitahuan kuota bawaan Codex",
+      "hideNativeQuotaBannerDescription": "Menyembunyikan pemberitahuan kuota habis di klien desktop tanpa mengubah kuota akun atau status layanan. Aktif secara bawaan saat desktop dimulai melalui layanan API, nonaktif pada kondisi lain. Pilihan disimpan per instans. Mode CLI tidak mengubah tampilan.",
       "configLoading": "Memuat konfigurasi instans…",
       "configRefreshing": "Memeriksa konfigurasi instans. Detail yang ada tetap tersedia.",
       "configLoadTimeout": "Waktu pemuatan konfigurasi instans habis. Silakan coba lagi.",

@@ -2331,6 +2331,8 @@
     "refreshAllSuccess": "刷新完成，共成功 {{count}} 个账号",
     "refreshAllPartialFailed": "刷新完成，成功 {{success}} / {{total}}，部分账号失败",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "隐藏 Codex 官方额度提示",
+      "hideNativeQuotaBannerDescription": "仅隐藏桌面客户端的额度耗尽提示，不修改账户额度或服务状态。API 服务的桌面启动默认开启，其他启动默认关闭；手动选择按实例保存。CLI 不执行显示注入。",
       "configLoading": "正在读取实例配置…",
       "configRefreshing": "正在核对实例配置，已有内容仍可查看。",
       "configLoadTimeout": "读取实例配置超时，请重试。",

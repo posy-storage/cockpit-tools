@@ -2111,6 +2111,8 @@
     "refreshAllSuccess": "Yenileme tamamlandı, {{count}} hesap başarılı",
     "refreshAllPartialFailed": "Yenileme tamamlandı, {{success}} / {{total}} hesap başarılı, bazıları başarısız",
     "launchPreview": {
+      "hideNativeQuotaBannerTitle": "Codex yerel kota bildirimini gizle",
+      "hideNativeQuotaBannerDescription": "Hesap kotasını veya hizmet durumunu değiştirmeden masaüstü istemcisindeki tükenen kota bildirimini gizler. API hizmeti üzerinden masaüstü başlatmalarında varsayılan olarak açık, diğer durumlarda kapalıdır. Seçiminiz her örnek için kaydedilir. CLI modunda arayüz değişmez.",
       "configLoading": "Örnek yapılandırması yükleniyor…",
       "configRefreshing": "Örnek yapılandırması denetleniyor. Mevcut bilgiler kullanılabilir durumda.",
       "configLoadTimeout": "Örnek yapılandırması yüklenirken zaman aşımı oluştu. Lütfen yeniden deneyin.",

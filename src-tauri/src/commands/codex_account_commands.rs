@@ -1292,6 +1292,7 @@ pub async fn switch_codex_account(
         Some(false),
         None,
         None,
+        None,
     ) {
         logger::log_warn(&format!("更新 Codex 默认实例绑定账号失败: {}", e));
     } else {

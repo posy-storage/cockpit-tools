@@ -42,6 +42,7 @@ export interface InstanceProfile {
   modelRouting?: CodexInstanceModelRouting | null;
   launchMode?: InstanceLaunchMode;
   appSpeed?: CodexAppSpeed;
+  hideNativeQuotaBanner?: boolean;
   createdAt: number;
   lastLaunchedAt?: number | null;
   lastPid?: number | null;

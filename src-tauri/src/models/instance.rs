@@ -74,6 +74,9 @@ pub struct InstanceProfile {
     pub launch_mode: InstanceLaunchMode,
     #[serde(default, skip_serializing_if = "is_standard_app_speed")]
     pub app_speed: CodexAppSpeed,
+    /// None follows the launch binding default; Some(false) is an explicit opt-out.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hide_native_quota_banner: Option<bool>,
     pub created_at: i64,
     pub last_launched_at: Option<i64>,
     #[serde(default)]
@@ -112,6 +115,8 @@ pub struct DefaultInstanceSettings {
     pub launch_mode: InstanceLaunchMode,
     #[serde(default, skip_serializing_if = "is_standard_app_speed")]
     pub app_speed: CodexAppSpeed,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hide_native_quota_banner: Option<bool>,
     #[serde(default = "default_follow_local_account")]
     pub follow_local_account: bool,
     #[serde(default)]
@@ -133,6 +138,7 @@ impl Default for DefaultInstanceSettings {
             working_dir: None,
             launch_mode: InstanceLaunchMode::App,
             app_speed: CodexAppSpeed::Standard,
+            hide_native_quota_banner: None,
             follow_local_account: true,
             auto_sync_threads: false,
             last_pid: None,
@@ -206,6 +212,23 @@ mod tests {
 
         assert!(store.instances[0].model_routing.is_none());
         assert!(store.default_settings.model_routing.is_none());
+        assert_eq!(store.instances[0].hide_native_quota_banner, None);
+        assert_eq!(store.default_settings.hide_native_quota_banner, None);
+    }
+
+    #[test]
+    fn native_quota_banner_preference_round_trips_without_erasing_explicit_false() {
+        for preference in [None, Some(false), Some(true)] {
+            let mut settings = DefaultInstanceSettings::default();
+            settings.hide_native_quota_banner = preference;
+            let value = serde_json::to_value(&settings).unwrap();
+            assert_eq!(
+                value.get("hideNativeQuotaBanner"),
+                preference.map(serde_json::Value::Bool).as_ref()
+            );
+            let restored: DefaultInstanceSettings = serde_json::from_value(value).unwrap();
+            assert_eq!(restored.hide_native_quota_banner, preference);
+        }
     }
 
     #[test]
