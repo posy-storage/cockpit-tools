@@ -18,6 +18,7 @@ jobs:
       contents: write
     outputs:
       version: ${{ steps.app_version.outputs.VERSION }}
+      has_legacy_manifest: ${{ steps.legacy_manifest.outputs.available }}
     env:
       GH_REPO: ${{ github.repository }}
     steps:
@@ -118,6 +119,7 @@ jobs:
           date -u +"%Y-%m-%dT%H:%M:%SZ" > published-at.txt
 
       - name: 💾 Preserve previous legacy latest.json
+        id: legacy_manifest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -130,8 +132,9 @@ jobs:
               --jq "[.[] | select(.isDraft == false and .isPrerelease == false and .tagName != \"${GITHUB_REF_NAME}\")][0].tagName // \"\""
           )"
           if [ -z "${PREVIOUS_TAG}" ]; then
-            echo "No previous published release was found; refusing to stage without a legacy updater manifest."
-            exit 1
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "First release: keep the release draft until all updater assets are ready."
+            exit 0
           fi
 
           mkdir -p previous-release
@@ -141,15 +144,17 @@ jobs:
             --clobber
           test -s previous-release/latest.json
           cp previous-release/latest.json legacy-latest.json
+          echo "available=true" >> "$GITHUB_OUTPUT"
           echo "Preserved legacy latest.json from ${PREVIOUS_TAG}"
 
-      # Publish the release early (with previous complete latest.json) so parallel
+      # When a previous manifest exists, publish early so parallel
       # platform jobs can verify assets via public tag download URLs without
       # waiting for Windows, and without reading the previous release's
       # same-named target manifests through /releases/latest/.
       - name: 🚀 Create or update staged release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HAS_LEGACY_MANIFEST: ${{ steps.legacy_manifest.outputs.available }}
         shell: bash
         run: |
           set -euo pipefail
@@ -168,10 +173,14 @@ jobs:
 
           IS_DRAFT="$(gh release view "${TAG}" --json isDraft --jq '.isDraft')"
           if [ "${IS_DRAFT}" = "true" ]; then
-            cp legacy-latest.json latest.json
-            gh release upload "${TAG}" latest.json --clobber
-            gh release edit "${TAG}" --draft=false --prerelease=false --latest
-            echo "Published staged release ${TAG} with legacy latest.json"
+            if [ "${HAS_LEGACY_MANIFEST}" = "true" ]; then
+              cp legacy-latest.json latest.json
+              gh release upload "${TAG}" latest.json --clobber
+              gh release edit "${TAG}" --draft=false --prerelease=false --latest
+              echo "Published staged release ${TAG} with legacy latest.json"
+            else
+              echo "Keeping first release ${TAG} as a draft until finalization"
+            fi
           else
             # Re-run after a prior publish: do not clobber a finalized latest.json.
             echo "Release ${TAG} is already published; leaving latest.json as-is"
@@ -292,6 +301,7 @@ jobs:
 
       # Fallback only: prepare should already have published with legacy latest.json.
       - name: 🚀 Ensure staged release is published
+        if: needs.prepare-release.outputs.has_legacy_manifest == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -312,6 +322,7 @@ jobs:
       # on /releases/latest/ before this release is marked latest (or before
       # other platforms finish). Public /latest/ is checked in finalize.
       - name: 🔍 Verify published Windows updater manifests
+        if: needs.prepare-release.outputs.has_legacy_manifest == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -436,6 +447,7 @@ jobs:
 
       # Tag URL (not /releases/latest/) — see Windows verify comment.
       - name: 🔍 Verify published macOS Apple Silicon updater manifest
+        if: needs.prepare-release.outputs.has_legacy_manifest == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -560,6 +572,7 @@ jobs:
 
       # Tag URL (not /releases/latest/) — see Windows verify comment.
       - name: 🔍 Verify published macOS Intel updater manifest
+        if: needs.prepare-release.outputs.has_legacy_manifest == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -782,6 +795,7 @@ jobs:
 
       # Tag URL (not /releases/latest/) — see Windows verify comment.
       - name: 🔍 Verify published Linux updater manifests
+        if: needs.prepare-release.outputs.has_legacy_manifest == 'true'
         shell: bash
         run: |
           set -euo pipefail
