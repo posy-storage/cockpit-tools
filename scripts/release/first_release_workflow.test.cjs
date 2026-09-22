@@ -45,15 +45,20 @@ const ghStub = [
   '  esac',
   '}',
 ].join('\n');
-function run(name, {previous = '', legacy = false, exists = false, draft = true, failDownload = false} = {}) {
+function run(name, {previous = '', legacy = false, exists = false, draft = true, failDownload = false, cask = false} = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cockpit-first-release-'));
   try {
     fs.writeFileSync(path.join(dir, 'release-notes.md'), 'Release notes');
     if (legacy) fs.writeFileSync(path.join(dir, 'legacy-latest.json'), 'previous-manifest');
     if (exists) fs.writeFileSync(path.join(dir, 'release-exists'), '');
-    const result = spawnSync(bashPath(), ['-euo', 'pipefail', '-c', ghStub + '\n' + script(name)], {
+    if (cask) {
+      fs.mkdirSync(path.join(dir, 'Casks'));
+      fs.copyFileSync(path.join(__dirname, '../../Casks/cockpit-tools.rb'), path.join(dir, 'Casks/cockpit-tools.rb'));
+    }
+    const result = spawnSync(bashPath(), ['-euo', 'pipefail', '-c', ghStub + '\ngit() { return 0; }\n' + script(name)], {
       cwd: dir, encoding: 'utf8',
       env: {...process.env, GITHUB_REF_NAME: 'v1.3.59',
+        GITHUB_REPOSITORY: 'posy-storage/cockpit-tools', VERSION: '1.3.60', SHA256: 'a'.repeat(64),
         GITHUB_OUTPUT: path.join(dir, 'output').replaceAll('\\', '/'),
         TEST_PREVIOUS: previous, TEST_DOWNLOAD_FAIL: String(failDownload),
         TEST_DRAFT: String(draft), HAS_LEGACY_MANIFEST: String(legacy)},
@@ -61,7 +66,7 @@ function run(name, {previous = '', legacy = false, exists = false, draft = true,
     if (result.error) throw result.error;
     const read = name => fs.existsSync(path.join(dir,name)) ? fs.readFileSync(path.join(dir,name),'utf8') : null;
     return {status: result.status, stderr: result.stderr, calls: read('calls.log') || '',
-      output: read('output'), legacy: read('legacy-latest.json'), latest: read('latest.json')};
+      output: read('output'), legacy: read('legacy-latest.json'), latest: read('latest.json'), cask: read('Casks/cockpit-tools.rb')};
   } finally { fs.rmSync(dir, {recursive:true, force:true}); }
 }
 
@@ -123,4 +128,13 @@ test('draft releases skip only early public checks; final verification and trigg
   assert.match(final, /--draft=false/);
   assert.match(final, /Verify complete published updater state/);
   assert.ok(workflow.includes('on:\n  push:\n    tags:\n      - "v*"\n  workflow_dispatch:\n'));
+});
+
+test('Homebrew uses the repository whose release artifact was hashed', () => {
+  const result = run('📝 Update Cask file', {cask:true});
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.cask, /version "1\.3\.60"/);
+  assert.ok(result.cask.includes('sha256 "' + 'a'.repeat(64) + '"'));
+  assert.ok(result.cask.includes('https://github.com/posy-storage/cockpit-tools/releases/download/'));
+  assert.ok(!result.cask.includes('https://github.com/jlcodes99/cockpit-tools/releases/download/'));
 });

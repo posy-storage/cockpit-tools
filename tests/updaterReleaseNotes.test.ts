@@ -3,9 +3,24 @@ import { describe, it } from "node:test";
 import {
   getUpdaterReleaseHighlightLines,
   prependUpdaterReleaseHighlights,
+  resolveUpdaterDownloadUrl,
 } from "../src/utils/updaterReleaseNotes.ts";
 
 describe("updater release highlights", () => {
+  it("uses this fork for fallback release download links", () => {
+    assert.equal(
+      resolveUpdaterDownloadUrl("1.3.60"),
+      "https://github.com/posy-storage/cockpit-tools/releases/tag/v1.3.60",
+    );
+    assert.equal(
+      resolveUpdaterDownloadUrl(""),
+      "https://github.com/posy-storage/cockpit-tools/releases/latest",
+    );
+    assert.equal(
+      resolveUpdaterDownloadUrl("1.3.60", { html_url: "https://example.com/release" }),
+      "https://example.com/release",
+    );
+  });
   it("prepends the three Chinese highlights for version 1.3.1", () => {
     const notes = prependUpdaterReleaseHighlights(
       "1.3.1",

@@ -9,6 +9,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 ## [Unreleased]
 
+## [1.3.60] - 2026-09-22
+
+### Fixed
+
+- **First release support**: repositories without a previous published version keep the release in draft until every platform build and the complete updater manifest are ready. Existing upgrade staging and tag/manual triggers remain unchanged.
+- **Independent fork updates**: updater manifests and fallback release links now point to posy-storage/cockpit-tools, using this fork's own updater signing public key.
+
+### Included
+
+- Includes the per-instance Codex native quota banner control introduced in 1.3.59: API Service desktop launches default on; other launches default off, with persisted manual overrides and recoverable semantic suppression.
+
 ## [1.3.59] - 2026-09-22
 
 ### Added

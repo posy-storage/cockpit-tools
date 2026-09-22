@@ -1008,6 +1008,11 @@ jobs:
             's/version \"[^\"]+\"/version \"'"${VERSION}"'\"/; s/sha256 \"[0-9a-f]{64}\"/sha256 \"'"${SHA256}"'\"/' \
             "${FILE}"
 
+          # Forks must use the same repository as the asset hashed above.
+          perl -i -pe \
+            's{https://github\.com/[^/]+/[^/]+/releases/download/}{"https://github.com/".$ENV{GITHUB_REPOSITORY}."/releases/download/"}ge' \
+            "${FILE}"
+
           git diff -- "${FILE}"
 
       - name: 🚀 Create pull request
